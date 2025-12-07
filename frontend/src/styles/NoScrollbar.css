@@ -1,0 +1,81 @@
+/* Complete Scrollbar Removal - All Browsers */
+
+/* Firefox */
+* {
+  scrollbar-width: none !important;
+}
+
+html {
+  scrollbar-width: none !important;
+}
+
+body {
+  scrollbar-width: none !important;
+}
+
+/* IE and Edge */
+* {
+  -ms-overflow-style: none !important;
+}
+
+html {
+  -ms-overflow-style: none !important;
+}
+
+body {
+  -ms-overflow-style: none !important;
+}
+
+/* Chrome, Safari, Opera */
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+html::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+#root::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+.app-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+.main-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* Ensure scrolling still works */
+html {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for all divs and containers */
+div::-webkit-scrollbar {
+  display: none !important;
+}
+
+section::-webkit-scrollbar {
+  display: none !important;
+}

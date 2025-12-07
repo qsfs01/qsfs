@@ -1,0 +1,22 @@
+@import './Parallax.css';
+
+.contact-form {
+  width: 100%;
+}
+
+.contact-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .contact-form {
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-form form {
+    gap: 10px;
+  }
+}

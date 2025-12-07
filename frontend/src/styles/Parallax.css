@@ -1,0 +1,173 @@
+/* Smooth UX-Friendly Parallax Effects for All Pages */
+
+/* Force Hide Scrollbar */
+html, body, * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* Page Hero - Subtle rotating background */
+.page-hero {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  padding: 80px 0 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 L40 40 M40 0 L0 40 M40 40 L80 80 M80 40 L40 80' stroke='rgba(255,255,255,0.1)' stroke-width='1' fill='none'/%3E%3Ccircle cx='40' cy='40' r='3' fill='rgba(255,255,255,0.2)'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+  animation: rotateBackground 60s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotateBackground {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.page-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.page-hero-content h1 {
+  color: #ffffff;
+  font-size: 3rem;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.page-hero-content p {
+  color: #e8e8e8;
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+/* Section Subtle Patterns - NO heavy parallax */
+.section {
+  position: relative;
+}
+
+.section[style*="background-color: var(--surface-color)"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='dots' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='10' cy='10' r='1' fill='%231a2b4a' opacity='0.05'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23dots)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  animation: moveDotsPattern 30s linear infinite;
+}
+
+body.dark-mode .section[style*="background-color: var(--surface-color)"]::after {
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='dots' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='10' cy='10' r='1' fill='%235a7ec4' opacity='0.08'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23dots)'/%3E%3C/svg%3E");
+}
+
+@keyframes moveDotsPattern {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100px 100px;
+  }
+}
+
+/* Diagonal Lines - Subtle movement */
+.section:nth-child(even)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 L100 100 M0 50 L50 100 M50 0 L100 50' stroke='%231a2b4a' stroke-width='0.5' opacity='0.05' fill='none'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+  pointer-events: none;
+  animation: slideDiagonal 25s linear infinite;
+}
+
+body.dark-mode .section:nth-child(even)::before {
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0 L100 100 M0 50 L50 100 M50 0 L100 50' stroke='%235a7ec4' stroke-width='0.5' opacity='0.08' fill='none'/%3E%3C/svg%3E");
+}
+
+@keyframes slideDiagonal {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100px);
+  }
+}
+
+/* Card Smooth Hover - NO 3D transforms that affect scrolling */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* Image Smooth Zoom */
+.image-wrapper {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.image-wrapper img {
+  transition: transform 0.3s ease;
+}
+
+.image-wrapper:hover img {
+  transform: scale(1.05);
+}
+
+/* Responsive - Disable animations on mobile for smooth scrolling */
+@media (max-width: 768px) {
+  .page-hero {
+    padding: 60px 0 40px;
+  }
+
+  .page-hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .page-hero-content p {
+    font-size: 1.1rem;
+  }
+
+  /* Disable all background animations on mobile for performance */
+  .page-hero::before,
+  .section::before,
+  .section::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-hero-content h1 {
+    font-size: 1.75rem;
+  }
+
+  .page-hero-content p {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: queensland-steel-frame-systems
+    env: node
+    region: oregon
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: EMAIL_USER
+        value: vibhorx1234@gmail.com
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: OWNER_EMAIL
+        value: agarwalmanish369@gmail.com
+      - key: FRONTEND_URL
+        value: https://queensland-steel-frame.onrender.com
