@@ -2,7 +2,7 @@ const otpStorage = new Map();
 const contactDataStorage = new Map();
 
 // Variable for the external email server URL - UPDATE THIS
-const EMAIL_SERVER_URL = 'http://localhost:3000/send-email';
+const EMAIL_SERVER_URL = 'https://qsfs.vercel.app/send-email';
 
 // Generate 6-digit OTP
 const generateOTP = () => {
