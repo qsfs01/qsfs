@@ -1,33 +1,41 @@
 const otpStorage = new Map();
 const contactDataStorage = new Map();
 
-// Variable for the external email server URL - UPDATE THIS
-const EMAIL_SERVER_URL = 'https://qsfs.vercel.app/send-email';
+// IMPORTANT: Update this to your Vercel deployment URL
+const EMAIL_SERVER_URL = process.env.EMAIL_SERVICE_URL || 'https://qsfs-email.vercel.app/send-email';
 
 // Generate 6-digit OTP
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Helper to send email via external server
+// Helper to send email via Vercel service
 const sendEmailViaExternalServer = async (toEmail, subject, content) => {
   try {
+    console.log('Sending request to email service:', EMAIL_SERVER_URL);
+    
     const response = await fetch(EMAIL_SERVER_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            toEmail,
-            subject,
-            content
-        })
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        toEmail,
+        subject,
+        content
+      })
     });
 
+    const responseData = await response.json();
+    
     if (!response.ok) {
-        throw new Error(`External server responded with status: ${response.status}`);
+      console.error('Email service error:', responseData);
+      throw new Error(responseData.message || `Email service responded with status: ${response.status}`);
     }
-    return response;
+    
+    console.log('Email service response:', responseData);
+    return responseData;
+    
   } catch (error) {
     console.error('Error sending email via external server:', error);
     throw error;
@@ -69,46 +77,46 @@ exports.sendOTP = async (req, res) => {
 
     // Email template for OTP
     const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #1a2b4a, #2d4373); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-            .otp-box { background: white; border: 2px solid #1a2b4a; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
-            .otp { font-size: 32px; font-weight: bold; color: #1a2b4a; letter-spacing: 5px; }
-            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Queensland Steel Frame Solutions</h1>
-              <p>Email Verification</p>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #1a2b4a, #2d4373); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .otp-box { background: white; border: 2px solid #1a2b4a; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
+          .otp { font-size: 32px; font-weight: bold; color: #1a2b4a; letter-spacing: 5px; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Queensland Steel Frame Solutions</h1>
+            <p>Email Verification</p>
+          </div>
+          <div class="content">
+            <h2>Hello ${name},</h2>
+            <p>Thank you for contacting Queensland Steel Frame Solutions</p>
+            <p>To complete your message submission, please verify your email address by entering the following OTP:</p>
+            <div class="otp-box">
+              <div class="otp">${otp}</div>
             </div>
-            <div class="content">
-              <h2>Hello ${name},</h2>
-              <p>Thank you for contacting Queensland Steel Frame Solutions</p>
-              <p>To complete your message submission, please verify your email address by entering the following OTP:</p>
-              <div class="otp-box">
-                <div class="otp">${otp}</div>
-              </div>
-              <p><strong>This OTP is valid for 10 minutes.</strong></p>
-              <p>If you didn't request this, please ignore this email.</p>
-              <div class="footer">
-                <p>&copy; 2024 Queensland Steel Frame Solutions. All rights reserved.</p>
-              </div>
+            <p><strong>This OTP is valid for 10 minutes.</strong></p>
+            <p>If you didn't request this, please ignore this email.</p>
+            <div class="footer">
+              <p>&copy; 2024 Queensland Steel Frame Solutions. All rights reserved.</p>
             </div>
           </div>
-        </body>
-        </html>
-      `;
+        </div>
+      </body>
+      </html>
+    `;
 
     console.log('Attempting to send OTP email to:', email);
 
-    // Send email via external server
+    // Send email via Vercel service
     await sendEmailViaExternalServer(email, 'Email Verification - Queensland Steel Frame Solutions', htmlContent);
 
     console.log('OTP email sent successfully to:', email);
@@ -185,90 +193,90 @@ exports.verifyOTP = async (req, res) => {
 
     // Send notification to owner
     const ownerHtmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #1a2b4a, #2d4373); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-            .info-box { background: white; border-left: 4px solid #1a2b4a; padding: 15px; margin: 15px 0; }
-            .label { font-weight: bold; color: #1a2b4a; }
-            .message-box { background: white; padding: 20px; border-radius: 8px; margin-top: 20px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>New Contact Form Submission</h1>
-              <p>Queensland Steel Frame Solutions</p>
-            </div>
-            <div class="content">
-              <h2>Contact Details</h2>
-              <div class="info-box">
-                <p><span class="label">Name:</span> ${contactData.name}</p>
-              </div>
-              <div class="info-box">
-                <p><span class="label">Email:</span> ${contactData.email}</p>
-              </div>
-              <div class="info-box">
-                <p><span class="label">Phone:</span> ${contactData.phone}</p>
-              </div>
-              <div class="info-box">
-                <p><span class="label">Subject:</span> ${contactData.subject}</p>
-              </div>
-              <div class="message-box">
-                <h3>Message:</h3>
-                <p>${contactData.message.replace(/\n/g, '<br>')}</p>
-              </div>
-              <p style="margin-top: 30px; color: #666; font-size: 14px;">
-                This message was sent from the Queensland Steel Frame Solutions website contact form on ${new Date().toLocaleString()}.
-              </p>
-            </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #1a2b4a, #2d4373); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .info-box { background: white; border-left: 4px solid #1a2b4a; padding: 15px; margin: 15px 0; }
+          .label { font-weight: bold; color: #1a2b4a; }
+          .message-box { background: white; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>New Contact Form Submission</h1>
+            <p>Queensland Steel Frame Solutions</p>
           </div>
-        </body>
-        </html>
-      `;
+          <div class="content">
+            <h2>Contact Details</h2>
+            <div class="info-box">
+              <p><span class="label">Name:</span> ${contactData.name}</p>
+            </div>
+            <div class="info-box">
+              <p><span class="label">Email:</span> ${contactData.email}</p>
+            </div>
+            <div class="info-box">
+              <p><span class="label">Phone:</span> ${contactData.phone}</p>
+            </div>
+            <div class="info-box">
+              <p><span class="label">Subject:</span> ${contactData.subject}</p>
+            </div>
+            <div class="message-box">
+              <h3>Message:</h3>
+              <p>${contactData.message.replace(/\n/g, '<br>')}</p>
+            </div>
+            <p style="margin-top: 30px; color: #666; font-size: 14px;">
+              This message was sent from the Queensland Steel Frame Solutions website contact form on ${new Date().toLocaleString()}.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
 
     // Send confirmation email to user
     const userConfirmationHtmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #1a2b4a, #2d4373); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Thank You!</h1>
-            </div>
-            <div class="content">
-              <h2>Hello ${contactData.name},</h2>
-              <p>Thank you for contacting Queensland Steel Frame Solutions</p>
-              <p>We have received your message and will get back to you as soon as possible.</p>
-              <p>Our team typically responds within 24-48 business hours.</p>
-              <p>If you have any urgent queries, please feel free to call us directly.</p>
-              <div class="footer">
-                <p>&copy; 2024 Queensland Steel Frame Solutions. All rights reserved.</p>
-              </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #1a2b4a, #2d4373); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Thank You!</h1>
+          </div>
+          <div class="content">
+            <h2>Hello ${contactData.name},</h2>
+            <p>Thank you for contacting Queensland Steel Frame Solutions</p>
+            <p>We have received your message and will get back to you as soon as possible.</p>
+            <p>Our team typically responds within 24-48 business hours.</p>
+            <p>If you have any urgent queries, please feel free to call us directly.</p>
+            <div class="footer">
+              <p>&copy; 2024 Queensland Steel Frame Solutions. All rights reserved.</p>
             </div>
           </div>
-        </body>
-        </html>
-      `;
+        </div>
+      </body>
+      </html>
+    `;
 
     console.log('Attempting to send confirmation emails...');
 
-    // Send both emails via external server
+    // Send both emails via Vercel service
     await Promise.all([
-      sendEmailViaExternalServer(process.env.OWNER_EMAIL, `New Contact Form Submission - ${contactData.subject}`, ownerHtmlContent),
+      sendEmailViaExternalServer(process.env.OWNER_EMAIL || 'om@qsfs.com.au', `New Contact Form Submission - ${contactData.subject}`, ownerHtmlContent),
       sendEmailViaExternalServer(contactData.email, 'Thank You for Contacting Us', userConfirmationHtmlContent)
     ]);
 
