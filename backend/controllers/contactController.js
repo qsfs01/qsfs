@@ -2,7 +2,7 @@ const otpStorage = new Map();
 const contactDataStorage = new Map();
 
 // IMPORTANT: Update this to your Vercel deployment URL
-const EMAIL_SERVER_URL = process.env.EMAIL_SERVICE_URL || 'https://qsfs-email.vercel.app/send-email';
+const EMAIL_SERVER_URL = process.env.EMAIL_SERVICE_URL || 'https://qsfs.vercel.app/send-email';
 
 // Generate 6-digit OTP
 const generateOTP = () => {
